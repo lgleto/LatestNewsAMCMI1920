@@ -1,6 +1,8 @@
 package ipca.example.lastestnews
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,9 +10,11 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.row_article.*
 import org.json.JSONObject
 import java.lang.Exception
 import java.net.URL
@@ -18,7 +22,7 @@ import java.nio.charset.Charset
 
 class MainActivity : AppCompatActivity() {
 
-    //https://newsapi.org/v2/top-headlines?country=pt&apiKey=1765f87e4ebc40229e80fd0f75b6416c
+    //https://newsapi.org/v2/top-headlines?country=pt&category=sports&apiKey=1765f87e4ebc40229e80fd0f75b6416c
 
     val articles : MutableList<Article> = ArrayList<Article>()
 
@@ -75,9 +79,31 @@ class MainActivity : AppCompatActivity() {
 
             val textViewTitle = view.findViewById<TextView>(R.id.textViewTitle)
             val textViewDate  = view.findViewById<TextView>(R.id.textViewDate)
+            val imageViewArticle = view.findViewById<ImageView>(R.id.imageView)
 
             textViewTitle.text = articles[position].title
             textViewDate.text  = articles[position].publishedAt
+
+            object : AsyncTask<Void,Void,Bitmap>(){
+                override fun doInBackground(vararg params: Void?): Bitmap? {
+                    val url = URL(articles[position].urlToImage)
+                    val input = url.openStream()
+                    val bmp = BitmapFactory.decodeStream(input)
+                    return bmp
+                }
+
+                override fun onPostExecute(result: Bitmap?) {
+                    super.onPostExecute(result)
+
+                    result?.let{
+                        imageViewArticle.setImageBitmap(it)
+                    }
+
+                }
+
+            }.execute()
+
+
 
             view.setOnClickListener {
                 val intent = Intent(this@MainActivity, ArticleDetailActivity::class.java)
@@ -111,7 +137,7 @@ class MainActivity : AppCompatActivity() {
     companion object{
 
         val BASE_API = "https://newsapi.org/v2/"
-        val PATH     = "top-headlines?country=pt"
+        val PATH     = "top-headlines?country=pt&category=sport"
         val API_KEY  = "&apiKey=1765f87e4ebc40229e80fd0f75b6416c"
 
     }
