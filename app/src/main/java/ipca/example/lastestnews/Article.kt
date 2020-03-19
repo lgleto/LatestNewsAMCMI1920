@@ -1,5 +1,7 @@
 package ipca.example.lastestnews
 
+import org.json.JSONObject
+
 //
 // Created by lourencogomes on 2020-03-12.
 //
@@ -31,5 +33,24 @@ class Article  {
         this.content = content
     }
 
+    constructor( ) {
+
+    }
+
+    companion object {
+         fun parseJson(jsonArticle: JSONObject) : Article {
+             val article = Article ()
+
+             article.author      = jsonArticle.getString("author")
+             article.content     = jsonArticle.getString("content")
+             article.description = jsonArticle.getString("description")
+             article.title       = jsonArticle.getString("title")
+             article.publishedAt = jsonArticle.getString("publishedAt")
+             article.url         = jsonArticle.getString("url")
+             article.urlToImage  = jsonArticle.getString("urlToImage")
+
+             return article
+         }
+    }
 
 }

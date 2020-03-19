@@ -4,6 +4,10 @@ import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.TextView
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
@@ -14,6 +18,10 @@ import java.nio.charset.Charset
 class MainActivity : AppCompatActivity() {
 
     //https://newsapi.org/v2/top-headlines?country=pt&apiKey=1765f87e4ebc40229e80fd0f75b6416c
+
+    val articles : MutableList<Article> = ArrayList<Article>()
+
+    val articlesAdapter = ArticlesAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,21 +50,49 @@ class MainActivity : AppCompatActivity() {
                     val articleJsonArray = jsonResult.getJSONArray("articles")
 
 
+                    for (index in 0 until articleJsonArray.length()) {
+                        val jsonArticle = articleJsonArray[index] as JSONObject
+                        articles.add(Article.parseJson(jsonArticle))
+                    }
 
+                    articlesAdapter.notifyDataSetChanged()
 
                 }else{
                     Toast.makeText(this@MainActivity, "Erro ao descrregar noticias", Toast.LENGTH_LONG).show()
                 }
-
-
-
-
             }
 
         }.execute()
 
 
+        listViewArticles.adapter = articlesAdapter
+    }
 
+    inner class ArticlesAdapter : BaseAdapter(){
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+            val view  = layoutInflater.inflate(R.layout.row_article,parent,false)
+
+            val textViewTitle = view.findViewById<TextView>(R.id.textViewTitle)
+            val textViewDate  = view.findViewById<TextView>(R.id.textViewDate)
+
+            textViewTitle.text = articles[position].title
+            textViewDate.text  = articles[position].publishedAt
+
+
+            return view
+        }
+
+        override fun getItem(position: Int): Any {
+            return articles[position]
+        }
+
+        override fun getItemId(position: Int): Long {
+            return 0
+        }
+
+        override fun getCount(): Int {
+            return articles.size
+        }
 
     }
 
