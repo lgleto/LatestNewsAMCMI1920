@@ -1,5 +1,6 @@
 package ipca.example.lastestnews
 
+import android.content.Intent
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -77,6 +78,17 @@ class MainActivity : AppCompatActivity() {
 
             textViewTitle.text = articles[position].title
             textViewDate.text  = articles[position].publishedAt
+
+            view.setOnClickListener {
+                val intent = Intent(this@MainActivity, ArticleDetailActivity::class.java)
+
+                intent.putExtra("title", articles[position].title)
+                intent.putExtra("url", articles[position].url)
+
+
+
+                startActivity(intent)
+            }
 
 
             return view
